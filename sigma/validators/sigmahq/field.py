@@ -21,6 +21,8 @@ from sigma.modifiers import (
     SigmaRegularExpressionModifier,
     SigmaRegularExpressionMultilineFlagModifier,
     SigmaCaseSensitiveModifier,
+    SigmaExpandModifier,
+    SigmaContainsModifier,
 )
 from .config import ConfigHq
 
@@ -238,3 +240,45 @@ class SigmahqFieldWithSpaceValidator(SigmaDetectionItemValidator):
             return [SigmahqFieldWithSpaceIssue(self.rule, detection_item.field)]
         else:
             return []
+
+
+@dataclass
+class SigmahqFieldUserLocalizationIssue(SigmaValidationIssue):
+    description: ClassVar[str] = "Field using localized user accounts"
+    severity: ClassVar[SigmaValidationIssueSeverity] = (
+        SigmaValidationIssueSeverity.MEDIUM
+    )
+    field: str
+    value: str
+
+
+class SigmahqFieldUserLocalizationValidator(SigmaDetectionItemValidator):
+    """Check field is an user accounts."""
+
+    user_list = ["administrator", "administrateur", "authority", "autorite"]
+
+    def validate_detection_item(
+        self, detection_item: SigmaDetectionItem
+    ) -> List[SigmaValidationIssue]:
+
+        # Bypass keyword detection
+        if detection_item.is_keyword():
+            return []
+
+        if "user" in detection_item.field.lower():
+            # Bypass placeholder
+            if SigmaExpandModifier in detection_item.modifiers:
+                return []
+
+            # Very dirty way to find :)
+            for name in detection_item.value:
+                if isinstance(name, SigmaString):
+                    for name_ban in self.user_list:
+                        if name_ban in name.to_plain().lower():
+                            return [
+                                SigmahqFieldUserLocalizationIssue(
+                                    self.rule, detection_item.field, name.to_plain()
+                                )
+                            ]
+
+        return []

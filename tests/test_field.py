@@ -19,6 +19,8 @@ from sigma.validators.sigmahq.field import (
     SigmahqFieldDuplicateValueValidator,
     SigmahqFieldWithSpaceIssue,
     SigmahqFieldWithSpaceValidator,
+    SigmahqFieldUserLocalizationIssue,
+    SigmahqFieldUserLocalizationValidator,
 )
 
 
@@ -413,6 +415,44 @@ def test_validator_SigmahqFieldWithSpaceValidator_valid():
         sel:
             Command_Line: 'valid'
             CommandLine: 'valid'
+        condition: sel
+    """
+    )
+    assert validator.validate(rule) == []
+
+
+def test_validator_SigmahqFieldUserLocalization():
+    validator = SigmahqFieldUserLocalizationValidator()
+    rule = SigmaRule.from_yaml(
+        """
+    title: A Space Field Name
+    status: test
+    logsource:
+        category: process_creation
+        product: windows
+    detection:
+        sel:
+            UserName: 'administrator'
+        condition: sel
+    """
+    )
+    assert validator.validate(rule) == [
+        SigmahqFieldUserLocalizationIssue(rule, "UserName", "administrator")
+    ]
+
+
+def test_validator_SigmahqFieldUserLocalization_valid():
+    validator = SigmahqFieldUserLocalizationValidator()
+    rule = SigmaRule.from_yaml(
+        """
+    title: A Space Field Name
+    status: test
+    logsource:
+        category: process_creation
+        product: windows
+    detection:
+        sel:
+            UserName|expand: '%administrator%'
         condition: sel
     """
     )
