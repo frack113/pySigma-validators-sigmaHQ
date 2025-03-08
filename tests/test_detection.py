@@ -203,6 +203,7 @@ def test_validator_SigmahqWindash():
     )
     assert validator.validate(rule) == [SigmahqWindashIssue(rule)]
 
+
 def test_validator_SigmahqWindash_valid():
     validator = SigmahqWindashValidator()
     rule = SigmaRule.from_yaml(

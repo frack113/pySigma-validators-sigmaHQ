@@ -14,7 +14,7 @@ from sigma.validators.base import (
     SigmaDetectionItem,
 )
 
-from sigma.modifiers import SigmaRegularExpressionModifier,SigmaWindowsDashModifier
+from sigma.modifiers import SigmaRegularExpressionModifier, SigmaWindowsDashModifier
 
 from .config import ConfigHQ
 
@@ -124,11 +124,10 @@ class SigmahqUnsupportedRegexGroupConstructValidator(SigmaDetectionItemValidator
             for regexp in unsupported_regexps
         ]
 
+
 @dataclass
 class SigmahqWindashIssue(SigmaValidationIssue):
-    description: ClassVar[str] = (
-        "Rule uses windash modifier not in last position"
-    )
+    description: ClassVar[str] = "Rule uses windash modifier not in last position"
     severity: ClassVar[SigmaValidationIssueSeverity] = SigmaValidationIssueSeverity.LOW
 
 
@@ -141,7 +140,10 @@ class SigmahqWindashValidator(SigmaDetectionItemValidator):
     def validate_detection_item(
         self, detection_item: SigmaDetectionItem
     ) -> List[SigmaValidationIssue]:
-        if SigmaWindowsDashModifier in detection_item.modifiers and detection_item.modifiers[-1] != SigmaWindowsDashModifier:
+        if (
+            SigmaWindowsDashModifier in detection_item.modifiers
+            and detection_item.modifiers[-1] != SigmaWindowsDashModifier
+        ):
             return [SigmahqWindashIssue(self.rule)]
         else:
             return []
