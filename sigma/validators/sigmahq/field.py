@@ -181,25 +181,6 @@ class SigmahqFieldDuplicateValueValidator(SigmaDetectionItemValidator):
 
 
 @dataclass
-class SigmahqInvalidAllModifierIssue(SigmaValidationIssue):
-    description: ClassVar[str] = "All modifier without a list of value"
-    severity: ClassVar[SigmaValidationIssueSeverity] = SigmaValidationIssueSeverity.HIGH
-    field: str
-
-
-class SigmahqInvalidAllModifierValidator(SigmaDetectionItemValidator):
-    """Check All modifier used with a single value."""
-
-    def validate_detection_item(
-        self, detection_item: SigmaDetectionItem
-    ) -> List[SigmaValidationIssue]:
-        if SigmaAllModifier in detection_item.modifiers and len(detection_item.value) < 2:
-            return [SigmahqInvalidAllModifierIssue(self.rule, detection_item.field)]
-        else:
-            return []
-
-
-@dataclass
 class SigmahqFieldUserIssue(SigmaValidationIssue):
     description: ClassVar[str] = "User Field has a Localized name"
     severity: ClassVar[SigmaValidationIssueSeverity] = SigmaValidationIssueSeverity.HIGH
