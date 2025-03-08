@@ -10,6 +10,8 @@ from sigma.validators.sigmahq.detection import (
     SigmahqCategoryWindowsProviderNameValidator,
     SigmahqUnsupportedRegexGroupConstructIssue,
     SigmahqUnsupportedRegexGroupConstructValidator,
+    SigmahqWindashIssue,
+    SigmahqWindashValidator,
 )
 
 
@@ -178,6 +180,41 @@ def test_validator_SigmahqUnsupportedRegexGroupConstruct_valid():
     detection:
         sel:
             field|re: 'a\w+b'
+        condition: sel
+    """
+    )
+    assert validator.validate(rule) == []
+
+
+def test_validator_SigmahqWindash():
+    validator = SigmahqWindashValidator()
+    rule = SigmaRule.from_yaml(
+        """
+    title: A Space Field Name
+    status: test
+    logsource:
+        product: windows
+        category: ps_module
+    detection:
+        sel:
+            Commandline|windash|contains: 'password'
+        condition: sel
+    """
+    )
+    assert validator.validate(rule) == [SigmahqWindashIssue(rule)]
+
+def test_validator_SigmahqWindash_valid():
+    validator = SigmahqWindashValidator()
+    rule = SigmaRule.from_yaml(
+        """
+    title: A Space Field Name
+    status: test
+    logsource:
+        product: windows
+        category: ps_module
+    detection:
+        sel:
+            Commandline|contains|windash: 'password'
         condition: sel
     """
     )
