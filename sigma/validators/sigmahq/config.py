@@ -12,6 +12,7 @@ from .sigmahq_data import (
     ref_sigmahq_logsource_definition,
     ref_windows_provider_name,
     ref_windows_no_eventid,
+    ref_sigmahq_unneededfields,
 )
 
 
@@ -56,6 +57,8 @@ class ConfigHQ:
         else:
             self.windows_provider_name = ref_windows_provider_name
             self.windows_no_eventid = ref_windows_no_eventid
+
+        self.sigmahq_unneededfields = ref_sigmahq_unneededfields
 
     def load_sigma_json(self, local_path: str):
         with open(os.path.join(local_path, "sigma.json"), "r", encoding="UTF-8") as file:

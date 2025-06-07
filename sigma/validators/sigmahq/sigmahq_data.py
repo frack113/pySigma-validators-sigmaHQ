@@ -6491,3 +6491,16 @@ ref_windows_no_eventid: List[str] = [
     "sysmon_error",
     "sysmon_status",
 ]
+
+
+
+ref_sigmahq_unneededfields: Dict[SigmaLogSource, List[str]] = {
+    SigmaLogSource(
+        category="registry_set",
+        product="windows",
+        service=None,
+        definition=None,
+        source=None,
+        custom_attributes=None,
+    ): ['EventType'],
+}
