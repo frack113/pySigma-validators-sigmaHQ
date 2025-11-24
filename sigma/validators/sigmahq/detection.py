@@ -12,10 +12,11 @@ from sigma.validators.base import (
     SigmaDetectionItemValidator,
     SigmaDetectionItem,
 )
-from sigma.types import SigmaRegularExpression, SigmaString
+from sigma.types import SigmaString
 from sigma.modifiers import SigmaRegularExpressionModifier
 
 from .config import ConfigHQ
+from .helper import is_detection_rule
 
 config = ConfigHQ()
 
@@ -32,16 +33,12 @@ class SigmahqCategoryEventIdValidator(SigmaDetectionItemValidator):
     """Checks if a rule uses an EventID field with a windows category logsource that doesn't require it."""
 
     def validate(self, rule: SigmaRule | SigmaCorrelationRule) -> List[SigmaValidationIssue]:
-        # Only validate SigmaRule (detection rules), not correlation rules
-        if not isinstance(rule, SigmaRule):
-            return []
-
         if (
-            rule.logsource.product == "windows"
+            is_detection_rule(rule)
+            and rule.logsource.product == "windows"
             and rule.logsource.category in config.windows_no_eventid
         ):
             return super().validate(rule)
-
         return []
 
     def validate_detection_item(
@@ -65,14 +62,9 @@ class SigmahqCategoryWindowsProviderNameValidator(SigmaDetectionItemValidator):
     """Checks if a rule uses a Provider_Name field with a windows category logsource that doesn't require it."""
 
     def validate(self, rule: SigmaRule | SigmaCorrelationRule) -> List[SigmaValidationIssue]:
-        # Only validate SigmaRule (detection rules), not correlation rules
-        if not isinstance(rule, SigmaRule):
-            return []
-
-        if rule.logsource in config.windows_provider_name:
+        if is_detection_rule(rule) and rule.logsource in config.windows_provider_name:
             self.list_provider = config.windows_provider_name[rule.logsource]
             return super().validate(rule)
-
         return []
 
     def validate_detection_item(
@@ -107,10 +99,9 @@ class SigmahqUnsupportedRegexGroupConstructValidator(SigmaDetectionItemValidator
     )
 
     def validate(self, rule: SigmaRule | SigmaCorrelationRule) -> List[SigmaValidationIssue]:
-        # Only validate SigmaRule (detection rules), not correlation rules
-        if not isinstance(rule, SigmaRule):
-            return []
-        return super().validate(rule)
+        if is_detection_rule(rule):
+            return super().validate(rule)
+        return []
 
     def validate_detection_item(
         self, detection_item: SigmaDetectionItem

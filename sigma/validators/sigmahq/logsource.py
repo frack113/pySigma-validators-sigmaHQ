@@ -9,6 +9,7 @@ from sigma.validators.base import (
 )
 
 from .config import ConfigHQ
+from .helper import is_detection_rule
 
 config = ConfigHQ()
 
@@ -24,20 +25,20 @@ class SigmahqLogsourceUnknownValidator(SigmaRuleValidator):
     """Checks if a rule uses an unknown logsource."""
 
     def validate(self, rule: SigmaRule | SigmaCorrelationRule) -> List[SigmaValidationIssue]:
-        # Ensure rule is a SigmaRule instance to access logsource
-        logsource = getattr(rule, "logsource", None)
-        if logsource is not None:
-            core_logsource = SigmaLogSource(
-                category=getattr(logsource, "category", None),
-                product=getattr(logsource, "product", None),
-                service=getattr(logsource, "service", None),
-            )
-            if not core_logsource in config.sigma_fieldsname:
-                return [SigmahqLogsourceUnknownIssue([rule], logsource)]
-            else:
-                return []
-        else:
-            return []
+        if is_detection_rule(rule):
+            logsource = getattr(rule, "logsource", None)
+            if logsource is not None:
+                core_logsource = SigmaLogSource(
+                    category=getattr(logsource, "category", None),
+                    product=getattr(logsource, "product", None),
+                    service=getattr(logsource, "service", None),
+                )
+                if not core_logsource in config.sigma_fieldsname:
+                    return [SigmahqLogsourceUnknownIssue([rule], logsource)]
+                else:
+                    return []
+
+        return []
 
 
 @dataclass
@@ -52,19 +53,16 @@ class SigmahqSysmonMissingEventidValidator(SigmaRuleValidator):
     """Checks if a rule uses the windows sysmon service logsource without the EventID field."""
 
     def validate(self, rule: SigmaRule | SigmaCorrelationRule) -> List[SigmaValidationIssue]:
-        # Only validate SigmaRule (detection rules), not correlation rules
-        if not isinstance(rule, SigmaRule):
-            return []
+        if is_detection_rule(rule):
+            if rule.logsource.service == "sysmon":
+                find = False
+                for selection in rule.detection.detections.values():
+                    for item in selection.detection_items:
+                        if item.field == "EventID":
+                            find = True
+                if find:
+                    return []
+                else:
+                    return [SigmahqSysmonMissingEventidIssue([rule])]
 
-        if rule.logsource.service == "sysmon":
-            find = False
-            for selection in rule.detection.detections.values():
-                for item in selection.detection_items:
-                    if item.field == "EventID":
-                        find = True
-            if find:
-                return []
-            else:
-                return [SigmahqSysmonMissingEventidIssue([rule])]
-        else:
-            return []
+        return []

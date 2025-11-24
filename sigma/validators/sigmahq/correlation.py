@@ -9,6 +9,8 @@ from sigma.validators.base import (
     SigmaValidationIssueSeverity,
 )
 
+from .helper import is_correlation_rule
+
 
 @dataclass
 class SigmahqCorrelationRulesMinimumIssue(SigmaValidationIssue):
@@ -22,7 +24,7 @@ class SigmahqCorrelationRulesMinimumValidator(SigmaRuleValidator):
     """Checks if temporal correlation rules have at least 2 rules."""
 
     def validate(self, rule: SigmaRule | SigmaCorrelationRule) -> List[SigmaValidationIssue]:
-        if isinstance(rule, SigmaCorrelationRule):
+        if is_correlation_rule(rule):
             if rule.type in [SigmaCorrelationType.TEMPORAL, SigmaCorrelationType.TEMPORAL_ORDERED]:
                 if len(rule.rules) < 2:
                     return [SigmahqCorrelationRulesMinimumIssue([rule])]
@@ -41,7 +43,7 @@ class SigmahqCorrelationGroupByExistenceValidator(SigmaRuleValidator):
     """Checks if a correlation rule has a group-by field for types that require it."""
 
     def validate(self, rule: SigmaRule | SigmaCorrelationRule) -> List[SigmaValidationIssue]:
-        if isinstance(rule, SigmaCorrelationRule):
+        if is_correlation_rule(rule):
             if rule.type in [
                 SigmaCorrelationType.EVENT_COUNT,
                 SigmaCorrelationType.VALUE_COUNT,
