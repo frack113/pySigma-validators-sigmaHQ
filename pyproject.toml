@@ -19,7 +19,7 @@ keywords = [ "pySigma", "SigmaHQ", "validators"]
 
 dependencies = [
     "pysigma >=1.0",
-    "requests >=2.32"
+    "requests >=2.33.0"
 ]
 
 [project.urls]
@@ -31,7 +31,7 @@ packages = [
 ]
 
 [tool.poetry.group.dev.dependencies]
-black = "^25.0"
+black = "^26.3"
 defusedxml = "^0.7"
 pytest = "^9.0"
 pytest-cov = "^7.0"
