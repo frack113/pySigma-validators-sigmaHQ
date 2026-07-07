@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 from typing import ClassVar, List, Tuple
 
-
-from sigma.rule import SigmaRule
 from sigma.correlations import SigmaCorrelationRule
+from sigma.rule import SigmaRule
 from sigma.validators.base import (
     SigmaRuleValidator,
     SigmaValidationIssue,
@@ -49,7 +48,8 @@ class SigmahqDescriptionLengthValidator(SigmaRuleValidator):
 @dataclass
 class SigmahqLinkInDescriptionIssue(SigmaValidationIssue):
     description: ClassVar[str] = (
-        "Rule has a description field that contains a reference to a hyperlink. All hyperlinks are reserved for the references field"
+        "Rule has a description field that contains a reference to a hyperlink. \
+All hyperlinks are reserved for the references field"
     )
     severity: ClassVar[SigmaValidationIssueSeverity] = SigmaValidationIssueSeverity.MEDIUM
     word: str

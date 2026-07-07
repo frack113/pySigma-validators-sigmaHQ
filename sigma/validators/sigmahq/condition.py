@@ -1,20 +1,20 @@
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
 from typing import ClassVar, List
+
 from sigma.correlations import SigmaCorrelationRule
 from sigma.rule import SigmaRule
 from sigma.validators.base import (
+    SigmaRuleValidator,
     SigmaValidationIssue,
     SigmaValidationIssueSeverity,
-    SigmaRuleValidator,
 )
 
 
 @dataclass
 class SigmahqOfthemConditionIssue(SigmaValidationIssue):
-    description: ClassVar[str] = (
-        "Rule uses the ' of them' keyword in the condition with only one selection in the detection section"
-    )
+    description: ClassVar[str] = "Rule uses the ' of them' keyword in the condition with only one \
+selection in the detection section"
     severity: ClassVar[SigmaValidationIssueSeverity] = SigmaValidationIssueSeverity.LOW
 
 
@@ -42,9 +42,8 @@ class SigmahqOfthemConditionValidator(SigmaRuleValidator):
 
 @dataclass
 class SigmahqOfselectionConditionIssue(SigmaValidationIssue):
-    description: ClassVar[str] = (
-        "Rule uses the 'All/X of ' format in the condition with only one selection in the detection section"
-    )
+    description: ClassVar[str] = "Rule uses the 'All/X of ' format in the condition with only one \
+selection in the detection section"
     severity: ClassVar[SigmaValidationIssueSeverity] = SigmaValidationIssueSeverity.LOW
     selection: str
 
@@ -79,7 +78,7 @@ class SigmahqOfselectionConditionValidator(SigmaRuleValidator):
                             for selection_name in detection.detections:
                                 if re.match(name, selection_name):
                                     selection_count += 1
-                            if selection_count < 2:
+                            if selection_count < 2:  # noqa: PLR2004
                                 return [SigmahqOfselectionConditionIssue([rule], name)]
         return []
 

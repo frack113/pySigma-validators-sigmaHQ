@@ -2,9 +2,8 @@ import re
 from dataclasses import dataclass
 from typing import ClassVar, List
 
-from sigma.rule import SigmaRule, SigmaLogSource
 from sigma.correlations import SigmaCorrelationRule
-
+from sigma.rule import SigmaLogSource, SigmaRule
 from sigma.validators.base import (
     SigmaRuleValidator,
     SigmaValidationIssue,
@@ -37,7 +36,7 @@ class SigmahqFilenameConventionValidator(SigmaRuleValidator):
         filename_pattern = re.compile(r"[a-z0-9_]{10,90}\.yml")
         if rule.source is not None:
             filename = rule.source.path.name
-            if filename_pattern.match(filename) is None or not "_" in filename:
+            if filename_pattern.match(filename) is None or "_" not in filename:
                 return [SigmahqFilenameConventionIssue([rule], filename)]
         return []
 
@@ -90,7 +89,7 @@ class SigmahqFilenamePrefixValidator(SigmaRuleValidator):
 
                 # Combined if it has separator and both correlation and logsource
                 return has_separator and has_correlation and has_logsource
-        except:
+        except Exception:
             return False
 
     def validate(self, rule: SigmaRule | SigmaCorrelationRule) -> List[SigmaValidationIssue]:
@@ -120,22 +119,20 @@ class SigmahqFilenamePrefixValidator(SigmaRuleValidator):
                             config.sigmahq_logsource_filepattern[logsource],
                         )
                     ]
-            else:
-                # check only product but must exist
-                if rule.logsource.product:
-                    logsource = SigmaLogSource(
-                        category=None, product=rule.logsource.product, service=None
-                    )
-                    if (
-                        logsource in config.sigmahq_logsource_filepattern
-                        and not filename.startswith(config.sigmahq_logsource_filepattern[logsource])
-                    ):
-                        return [
-                            SigmahqFilenamePrefixIssue(
-                                [rule],
-                                filename,
-                                rule.logsource,
-                                config.sigmahq_logsource_filepattern[logsource],
-                            )
-                        ]
+            # check only product but must exist
+            elif rule.logsource.product:
+                logsource = SigmaLogSource(
+                    category=None, product=rule.logsource.product, service=None
+                )
+                if logsource in config.sigmahq_logsource_filepattern and not filename.startswith(
+                    config.sigmahq_logsource_filepattern[logsource]
+                ):
+                    return [
+                        SigmahqFilenamePrefixIssue(
+                            [rule],
+                            filename,
+                            rule.logsource,
+                            config.sigmahq_logsource_filepattern[logsource],
+                        )
+                    ]
         return []

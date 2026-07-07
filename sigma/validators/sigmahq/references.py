@@ -1,9 +1,9 @@
+import re
 from dataclasses import dataclass
 from typing import ClassVar, List
-import re
 
-from sigma.rule import SigmaRule
 from sigma.correlations import SigmaCorrelationRule
+from sigma.rule import SigmaRule
 from sigma.validators.base import (
     SigmaRuleValidator,
     SigmaValidationIssue,
@@ -13,9 +13,9 @@ from sigma.validators.base import (
 
 @dataclass
 class SigmahqGithubLinkIssue(SigmaValidationIssue):
-    description: ClassVar[str] = (
-        "Rule has a branch GitHub link instead of a permalink. Use e.g. https://github.com/SigmaHQ/sigma/blob/bd2a4c37efde5f69f87040173e990f1f6ff9e234/README.md instead of https://github.com/SigmaHQ/sigma/blob/master/README.md"
-    )
+    description: ClassVar[str] = "Rule has a branch GitHub link instead of a permalink. Use e.g. \
+https://github.com/SigmaHQ/sigma/blob/bd2a4c37efde5f69f87040173e990f1f6ff9e234/README.md \
+instead of https://github.com/SigmaHQ/sigma/blob/master/README.md"
     severity: ClassVar[SigmaValidationIssueSeverity] = SigmaValidationIssueSeverity.MEDIUM
     link: str
 

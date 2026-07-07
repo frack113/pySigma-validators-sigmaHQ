@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass
 from typing import ClassVar, List, Tuple
+
+import sigma.data.mitre_attack as _mitre_attack
 from sigma.correlations import SigmaCorrelationRule
 from sigma.rule import SigmaRule
 from sigma.validators.base import (
@@ -9,8 +11,6 @@ from sigma.validators.base import (
     SigmaValidationIssue,
     SigmaValidationIssueSeverity,
 )
-
-import sigma.data.mitre_attack as _mitre_attack
 
 from .config import ConfigHQ
 
@@ -99,7 +99,8 @@ class SigmahqTagsTlpValidator(SigmaRuleValidator):
 @dataclass
 class SigmahqTagsTechniquesWithoutTacticsIssue(SigmaValidationIssue):
     description: ClassVar[str] = (
-        "A MITRE ATT&CK technique tag was found without its corresponding tactic name. (e.g. when using 'attack.t1059' you have to add 'attack.execution' as well)"
+        "A MITRE ATT&CK technique tag was found without its corresponding tactic name. \
+(e.g. when using 'attack.t1059' you have to add 'attack.execution' as well)"
     )
     severity: ClassVar[SigmaValidationIssueSeverity] = SigmaValidationIssueSeverity.MEDIUM
     techniques: List[str]

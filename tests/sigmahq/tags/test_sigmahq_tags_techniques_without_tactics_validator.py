@@ -1,6 +1,7 @@
 # tests/sigmahq/test_sigmahq_tags_techniques_without_tactics_validator.py
-from sigma.rule import SigmaRule
 from sigma.correlations import SigmaCorrelationRule
+from sigma.rule import SigmaRule
+
 from sigma.validators.sigmahq.tags import (
     SigmahqTagsTechniquesWithoutTacticsIssue,
     SigmahqTagsTechniquesWithoutTacticsValidator,
@@ -29,7 +30,7 @@ detection:
         SigmahqTagsTechniquesWithoutTacticsIssue(
             [detection_rule],
             techniques=["attack.t1027.004", "attack.t1027.005"],
-            missing_tactic="attack.defense-evasion",
+            missing_tactic="attack.stealth",
         )
     ]
 
@@ -41,7 +42,7 @@ def test_validator_SigmahqTagsTechniquesWithoutTactics_valid():
 title: test
 status: unsupported
 tags:
-    - attack.defense-evasion
+    - attack.stealth
     - attack.t1027.004
 logsource:
     category: test
@@ -81,7 +82,7 @@ def test_validator_SigmahqTagsTechniquesWithoutTactics_correlation_with_tactic()
 title: test correlation
 id: 0e95725d-7320-415d-80f7-004da920fc11
 tags:
-    - attack.defense-evasion
+    - attack.stealth
     - attack.t1027.004
 correlation:
     type: event_count

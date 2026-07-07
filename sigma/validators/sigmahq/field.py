@@ -1,28 +1,28 @@
-from pathlib import Path
+import re
 from dataclasses import dataclass
 from typing import ClassVar, List, Tuple
-import re
-from sigma.correlations import SigmaCorrelationRule
-from sigma.rule import SigmaRule, SigmaLogSource
-from sigma.types import SigmaString
-from sigma.validators.base import (
-    SigmaValidationIssue,
-    SigmaValidationIssueSeverity,
-    SigmaDetectionItemValidator,
-    SigmaDetectionItem,
-)
 
+from sigma.correlations import SigmaCorrelationRule
 from sigma.modifiers import (
     SigmaAllModifier,
     SigmaBase64Modifier,
     SigmaBase64OffsetModifier,
+    SigmaCaseSensitiveModifier,
     SigmaRegularExpressionDotAllFlagModifier,
     SigmaRegularExpressionFlagModifier,
     SigmaRegularExpressionIgnoreCaseFlagModifier,
     SigmaRegularExpressionModifier,
     SigmaRegularExpressionMultilineFlagModifier,
-    SigmaCaseSensitiveModifier,
 )
+from sigma.rule import SigmaLogSource, SigmaRule
+from sigma.types import SigmaString
+from sigma.validators.base import (
+    SigmaDetectionItem,
+    SigmaDetectionItemValidator,
+    SigmaValidationIssue,
+    SigmaValidationIssueSeverity,
+)
+
 from .config import ConfigHQ
 
 config = ConfigHQ()
@@ -44,7 +44,7 @@ class SigmahqSpaceFieldNameValidator(SigmaDetectionItemValidator):
             return []
         return super().validate(rule)
 
-    def validate_detection_item(
+    def validate_detection_item(  # noqa: PLR0912
         self, detection_item: SigmaDetectionItem
     ) -> List[SigmaValidationIssue]:
         if detection_item.field and " " in detection_item.field:
@@ -87,7 +87,7 @@ class SigmahqFieldnameCastValidator(SigmaDetectionItemValidator):
     ) -> List[SigmaValidationIssue]:
         if (
             detection_item.field is not None
-            and not detection_item.field in self.fields
+            and detection_item.field not in self.fields
             and any(x for x in self.fields if detection_item.field.casefold() == x.casefold())
         ):
             return [SigmahqFieldnameCastIssue([self.rule], detection_item.field)]
@@ -127,7 +127,7 @@ class SigmahqInvalidFieldnameValidator(SigmaDetectionItemValidator):
     def validate_detection_item(
         self, detection_item: SigmaDetectionItem
     ) -> List[SigmaValidationIssue]:
-        if detection_item.field is not None and not detection_item.field in self.fields:
+        if detection_item.field is not None and detection_item.field not in self.fields:
             return [SigmahqInvalidFieldnameIssue([self.rule], detection_item.field)]
         else:
             return []
@@ -191,7 +191,7 @@ class SigmahqFieldDuplicateValueValidator(SigmaDetectionItemValidator):
                     else:
                         return []
                 else:
-                    value_see.append(str(v).lower())
+                    value_see.append(str(v).lower())  # type: ignore[arg-type]
             return []
 
 
@@ -214,7 +214,7 @@ class SigmahqInvalidAllModifierValidator(SigmaDetectionItemValidator):
     def validate_detection_item(
         self, detection_item: SigmaDetectionItem
     ) -> List[SigmaValidationIssue]:
-        if SigmaAllModifier in detection_item.modifiers and len(detection_item.value) < 2:
+        if SigmaAllModifier in detection_item.modifiers and len(detection_item.value) < 2:  # noqa: PLR2004
             if detection_item.field is not None:
                 return [SigmahqInvalidAllModifierIssue([self.rule], detection_item.field)]
             else:
@@ -311,7 +311,7 @@ class SigmahqInvalidHashKvValidator(SigmaDetectionItemValidator):
                             except ValueError:
                                 errors.append(s_value)
                 else:
-                    errors.append(v)
+                    errors.append(v)  # type: ignore[arg-type]
 
         return [SigmahqInvalidHashKvIssue([self.rule], v) for v in errors]
 

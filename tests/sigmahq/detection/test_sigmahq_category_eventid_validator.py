@@ -1,5 +1,6 @@
 from sigma.correlations import SigmaCorrelationRule
 from sigma.rule import SigmaRule
+
 from sigma.validators.sigmahq.detection import (
     SigmahqCategoryEventIdIssue,
     SigmahqCategoryEventIdValidator,
@@ -74,7 +75,7 @@ logsource:
 detection:
     sel:
         field: path\\*something
-        EventID: 
+        EventID:
             - 4103
             - 4104
     condition: sel

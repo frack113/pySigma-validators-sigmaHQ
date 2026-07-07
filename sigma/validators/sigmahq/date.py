@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import ClassVar, List
 
-from sigma.rule import SigmaRule
 from sigma.correlations import SigmaCorrelationRule
+from sigma.rule import SigmaRule
 from sigma.validators.base import (
     SigmaRuleValidator,
     SigmaValidationIssue,
@@ -29,7 +29,8 @@ class SigmahqDateExistenceValidator(SigmaRuleValidator):
 @dataclass
 class SigmahqModifiedDateOrderIssue(SigmaValidationIssue):
     description: ClassVar[str] = (
-        "Rule has a modified field whose value is older than that of the date field. The modified date has always to be newer than date."
+        "Rule has a modified field whose value is older than that of the date field. \
+The modified date has always to be newer than date."
     )
     severity: ClassVar[SigmaValidationIssueSeverity] = SigmaValidationIssueSeverity.MEDIUM
 

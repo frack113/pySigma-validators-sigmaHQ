@@ -24,8 +24,10 @@ jobs:
           cache: poetry
       - name: Install dependencies
         run: poetry install
-      - name: Lint with black
-        run: poetry run black --check .
+      - name: Install ruff
+        run: pip install "ruff>=0.12,<1"
+      - name: Lint with ruff
+        run: ruff format --check .
       - name: Run tests
         run: poetry run pytest --cov=sigma --cov-report term --cov-report xml:cov.xml -vv
       - name: Store coverage for badge

@@ -1,6 +1,6 @@
 [project]
 name = "pySigma-validators-sigmahq"
-version = "0.20.2"
+version = "0.20.3"
 description = "pySigma SigmaHQ validators"
 license = "LGPL-2.1-only"
 readme = "README.md"
@@ -10,7 +10,7 @@ authors = [
     {name = "François Hubaut", email = "frack113@users.noreply.github.com" }
 ]
 
-maintainers =[
+maintainers = [
     {name = "François Hubaut", email = "frack113@users.noreply.github.com" },
     {name = "Christian Burkard", email = "phantinuss@users.noreply.github.com" }
 ]
@@ -18,8 +18,8 @@ maintainers =[
 keywords = [ "pySigma", "SigmaHQ", "validators"]
 
 dependencies = [
-    "pysigma >=1.0",
-    "requests >=2.32"
+    "pysigma >=1.3",
+    "requests >=2.34"
 ]
 
 [project.urls]
@@ -31,15 +31,53 @@ packages = [
 ]
 
 [tool.poetry.group.dev.dependencies]
-black = "^25.0"
+ruff = ">=0.12,<1"
 defusedxml = "^0.7"
-pytest = "^9.0"
-pytest-cov = "^7.0"
-mypy = "^1.18"
-types-requests = "^2.32"
+pytest = "^9.1"
+pytest-cov = "^7.1"
+mypy = "^2.0"
+check-jsonschema = "^0.29"
 
-[tool.black]
+[tool.ruff]
 line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I001", "S", "PLR"]
+
+[tool.ruff.lint.per-file-ignores]
+# F401: Import not used (intentional in __init__.py to expose public API)
+"__init__.py" = ["F401"]
+
+# S101: assert is acceptable in tests
+# PLR2004: Magic values (e.g., 2) sometimes make more sense than introducing a constant for a one-off comparison
+# S108: /tmp usage is acceptable in test fixtures
+"tests/**" = ["S101", "PLR2004", "S108"]
+
+# S101: assert is acceptable in tools
+"tools/**" = ["S101"]
+
+# PLR0912: Too many branches - complex validation logic in field validators
+"sigma/validators/sigmahq/field.py" = ["PLR0912"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = false
+warn_unused_configs = false
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false
+disallow_untyped_decorators = false
+no_implicit_optional = false
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["pytest.*"]
+ignore_missing_imports = true
 
 [build-system]
 requires = ["poetry-core"]
