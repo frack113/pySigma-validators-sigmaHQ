@@ -36,7 +36,7 @@ defusedxml = "^0.7"
 pytest = "^9.1"
 pytest-cov = "^7.1"
 mypy = "^2.0"
-check-jsonschema = "^0.29"
+check-jsonschema = "^0.30"
 
 [tool.ruff]
 line-length = 100
