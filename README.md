@@ -14,9 +14,7 @@ TBD
 
 ## 🧬 Data
 
-All the data value are in the config.py
-
-To use a local json version, you need to put them in a `validator_json` folder visible from the launch directory.
+All the data value are in the json files in the tools directory
 
 ## 📜 Maintainer
 
