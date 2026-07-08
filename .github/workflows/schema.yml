@@ -33,4 +33,5 @@ jobs:
             run: |
                 poetry run check-jsonschema --schemafile ./json-schema/schema_sigmahq_taxonomy.json ./tools/sigmahq_taxonomy.json
                 poetry run check-jsonschema --schemafile ./json-schema/schema_sigmahq_filename.json ./tools/sigmahq_filename.json
-                poetry run check-jsonschema --schemafile ./json-schema/schema_sigmahq_windows_validator.json ./tools/sigmahq_windows_validator.json
+                poetry run check-jsonschema --schemafile ./json-schema/schema_sigmahq_windows_eventid.json ./tools/sigmahq_windows_eventid.json
+                poetry run check-jsonschema --schemafile ./json-schema/schema_sigmahq_windows_provider.json ./tools/sigmahq_windows_provider.json
