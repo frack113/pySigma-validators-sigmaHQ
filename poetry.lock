@@ -208,14 +208,14 @@ files = [
 
 [[package]]
 name = "check-jsonschema"
-version = "0.29.4"
+version = "0.30.0"
 description = "A jsonschema CLI and pre-commit hook"
 optional = false
 python-versions = ">=3.8"
 groups = ["dev"]
 files = [
-    {file = "check_jsonschema-0.29.4-py3-none-any.whl", hash = "sha256:7cecf505b4d2aba02e260daa4834346566b1ef3c22720b40cc78cbc72a27fe3e"},
-    {file = "check_jsonschema-0.29.4.tar.gz", hash = "sha256:984864fabc82a108e30cb1ff63b6b7e6f43a7eb7df8d95a603051b0ca625184d"},
+    {file = "check_jsonschema-0.30.0-py3-none-any.whl", hash = "sha256:c7fb2de2017ab81a85b08c7332d6f074b0565d41d068de25a6e42a8a6a0b723d"},
+    {file = "check_jsonschema-0.30.0.tar.gz", hash = "sha256:c912ef9cf204c17d2e9d832b9088040f1c0c3f178ebda9805a56e5f35b29f5f2"},
 ]
 
 [package.dependencies]
@@ -227,8 +227,8 @@ requests = "<3.0"
 tomli = {version = ">=2.0", markers = "python_version < \"3.11\""}
 
 [package.extras]
-dev = ["click-type-test (==0.0.7) ; python_version >= \"3.10\"", "coverage (<8)", "pytest (<9)", "pytest-xdist (<4)", "responses (==0.25.3)"]
-docs = ["furo (==2024.8.6)", "sphinx (<9)", "sphinx-issues (<5)"]
+dev = ["click-type-test (==1.0.0) ; python_version >= \"3.10\"", "coverage (<8)", "pytest (<9)", "pytest-xdist (<4)", "responses (==0.25.3)"]
+docs = ["furo (==2024.8.6)", "sphinx (<9)", "sphinx-issues (<6)"]
 
 [[package]]
 name = "click"
@@ -1686,4 +1686,4 @@ zstd = ["backports-zstd (>=1.0.0) ; python_version < \"3.14\""]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "d19461069d9a1bbeb3ccee8517b809978973804f44e782b0fd457fae067d9521"
+content-hash = "3dccb64edce3b5eab53966aee548ae32649a9ff683726949ba144735f8ffa63d"
