@@ -1,3 +1,4 @@
+import http.client
 import json
 
 from pathlib import Path
@@ -28,13 +29,13 @@ def _get_cache() -> diskcache.Cache:
     return _cache
 
 
-def _load_sigmahq_json() -> Dict[str, str]:
+def _load_sigmahq_json() -> Dict[str, Any]:
     cache = _get_cache()
     cache_key = f"sigmahq_eventid_{_custom_url or 'default'}"
 
     cached_data = cache.get(cache_key)
     if cached_data is not None:
-        return cast(dict[str, str], cached_data)
+        return cast(Dict[str, Any], cached_data)
 
     url = _custom_url if _custom_url is not None else SIGMAHQ_EVENTID_URL
 
@@ -45,14 +46,14 @@ def _load_sigmahq_json() -> Dict[str, str]:
         else:
             with urlopen(url, timeout=30) as response:
                 json_data = json.load(response)
-    except (URLError, json.JSONDecodeError, OSError, IOError) as e:
+    except (URLError, json.JSONDecodeError, OSError, IOError, http.client.HTTPException) as e:
         raise RuntimeError(f"Failed to load data: {e}") from e
 
-    sigmahq_category_no_eventid_version = json_data["version"]
-    sigmahq_category_no_eventid = json_data["category_no_eventid"]
+    sigmahq_category_no_eventid_version = json_data.get("version", "unknown")
+    sigmahq_category_no_eventid = json_data.get("category_no_eventid", [])
 
     result = {
-        "sigmahq_category_no_eventid_version": sigmahq_category_no_eventid_version or "unknown",
+        "sigmahq_category_no_eventid_version": sigmahq_category_no_eventid_version,
         "sigmahq_category_no_eventid": sigmahq_category_no_eventid,
     }
 
@@ -61,7 +62,7 @@ def _load_sigmahq_json() -> Dict[str, str]:
     return result
 
 
-def _get_cached_data() -> Dict[str, str]:
+def _get_cached_data() -> Dict[str, Any]:
     return _load_sigmahq_json()
 
 
@@ -79,9 +80,10 @@ def clear_cache() -> None:
 
 
 def set_url(url: str) -> None:
-    global _custom_url
+    global _custom_url, _cache
     _custom_url = url
     clear_cache()
+    _cache = None
 
 
 def set_cache_dir(cache_dir: str) -> None:

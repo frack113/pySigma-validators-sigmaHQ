@@ -1,3 +1,4 @@
+import http.client
 import json
 
 from pathlib import Path
@@ -47,14 +48,16 @@ def _load_sigmahq_json() -> Dict[str, Any]:
         else:
             with urlopen(url, timeout=30) as response:
                 json_data = json.load(response)
-    except (URLError, json.JSONDecodeError, OSError, IOError) as e:
+    except (URLError, json.JSONDecodeError, OSError, IOError, http.client.HTTPException) as e:
         raise RuntimeError(f"Failed to load data: {e}") from e
 
     sigmahq_filename_version = json_data.get("version", "unknown")
-    sigmahq_filename_pattern: Dict[str, List[str]] = {}
+    sigmahq_filename_pattern: Dict[str, str] = {}
 
     if "pattern" in json_data:
         for info in json_data["pattern"].values():
+            if "logsource" not in info or "prefix" not in info:
+                continue
             logsource = SigmaLogSource.from_dict(info["logsource"])
             logsource_key = f"{logsource.product}_{logsource.category}_{logsource.service}"
             sigmahq_filename_pattern[logsource_key] = info["prefix"]
@@ -87,9 +90,10 @@ def clear_cache() -> None:
 
 
 def set_url(url: str) -> None:
-    global _custom_url
+    global _custom_url, _cache
     _custom_url = url
     clear_cache()
+    _cache = None
 
 
 def set_cache_dir(cache_dir: str) -> None:

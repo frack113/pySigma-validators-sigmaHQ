@@ -1,3 +1,4 @@
+import http.client
 import json
 from pathlib import Path
 
@@ -48,7 +49,7 @@ def _load_sigmahq_json() -> Dict[str, Any]:
         else:
             with urlopen(url, timeout=30) as response:
                 json_data = json.loads(response.read())
-    except (URLError, json.JSONDecodeError, OSError, IOError) as e:
+    except (URLError, json.JSONDecodeError, OSError, IOError, http.client.HTTPException) as e:
         raise RuntimeError(f"Failed to load data: {e}") from e
 
     sigmahq_taxonomy_version = json_data.get("version", "unknown")
@@ -60,10 +61,11 @@ def _load_sigmahq_json() -> Dict[str, Any]:
         for info in json_data["taxonomy"].values():
             logsource = SigmaLogSource.from_dict(info["logsource"])
             logsource_key = f"{logsource.product}_{logsource.category}_{logsource.service}"
+            field_info = info.get("field", {})
             sigmahq_taxonomy_fieldsname[logsource_key] = sorted(
-                info["field"]["native"] + info["field"]["custom"], key=str.casefold
+                field_info.get("native", []) + field_info.get("custom", []), key=str.casefold
             )
-            sigmahq_taxonomy_redundant_fields[logsource_key] = info["field"]["redundant"]
+            sigmahq_taxonomy_redundant_fields[logsource_key] = field_info.get("redundant", [])
             if "definition" in info["logsource"]:
                 sigmahq_taxonomy_logsource_definition[logsource_key] = info["logsource"].get(
                     "definition"
@@ -94,7 +96,6 @@ def __getattr__(name: str) -> Any:
 
 
 def clear_cache() -> None:
-    global _cache
     cache = _get_cache()
     cache.clear()
 
