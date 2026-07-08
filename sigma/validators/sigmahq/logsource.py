@@ -1,17 +1,13 @@
 from dataclasses import dataclass
-from typing import ClassVar, List
-
+from typing import ClassVar, List, Optional
 from sigma.correlations import SigmaCorrelationRule
-from sigma.rule import SigmaLogSource, SigmaRule
+from sigma.rule import SigmaRule, SigmaLogSource
 from sigma.validators.base import (
     SigmaRuleValidator,
     SigmaValidationIssue,
     SigmaValidationIssueSeverity,
 )
-
-from .config import ConfigHQ
-
-config = ConfigHQ()
+from sigma.validators.sigmahq.data import data_taxonomy
 
 
 @dataclass
@@ -22,23 +18,22 @@ class SigmahqLogsourceUnknownIssue(SigmaValidationIssue):
 
 
 class SigmahqLogsourceUnknownValidator(SigmaRuleValidator):
-    """Checks if a rule uses an unknown logsource."""
+    """Checks if a rule uses an unknown logsource.
+
+    This validator verifies that all logsource keys (product_category_service)
+    are registered in the data taxonomy. If not, it raises a HIGH severity validation issue.
+    """
 
     def validate(self, rule: SigmaRule | SigmaCorrelationRule) -> List[SigmaValidationIssue]:
-        # Ensure rule is a SigmaRule instance to access logsource
-        logsource = getattr(rule, "logsource", None)
-        if logsource is not None:
-            core_logsource = SigmaLogSource(
-                category=getattr(logsource, "category", None),
-                product=getattr(logsource, "product", None),
-                service=getattr(logsource, "service", None),
-            )
-            if core_logsource not in config.sigma_fieldsname:
-                return [SigmahqLogsourceUnknownIssue([rule], logsource)]
-            else:
-                return []
-        else:
+        if not isinstance(rule, SigmaRule):
             return []
+
+        logsource = getattr(rule, "logsource")
+
+        logsource_key = f"{logsource.product}_{logsource.category}_{logsource.service}"
+        if logsource_key not in data_taxonomy.sigmahq_taxonomy_fieldsname:
+            return [SigmahqLogsourceUnknownIssue([rule], logsource)]
+        return []
 
 
 @dataclass
@@ -50,22 +45,25 @@ class SigmahqSysmonMissingEventidIssue(SigmaValidationIssue):
 
 
 class SigmahqSysmonMissingEventidValidator(SigmaRuleValidator):
-    """Checks if a rule uses the windows sysmon service logsource without the EventID field."""
+    """Checks if a rule using Sysmon logsource is missing the EventID field.
+
+    This validator ensures that all rules using Windows Sysmon logsource have at least one
+    detection item with the EventID field, which is required for proper event filtering.
+    """
 
     def validate(self, rule: SigmaRule | SigmaCorrelationRule) -> List[SigmaValidationIssue]:
-        # Only validate SigmaRule (detection rules), not correlation rules
         if not isinstance(rule, SigmaRule):
             return []
 
-        if rule.logsource.service == "sysmon":
-            find = False
-            for selection in rule.detection.detections.values():
-                for item in selection.detection_items:
-                    if item.field == "EventID":  # type: ignore[union-attr]
-                        find = True
-            if find:
-                return []
-            else:
-                return [SigmahqSysmonMissingEventidIssue([rule])]
-        else:
+        if rule.logsource.service != "sysmon":
             return []
+
+        has_eventid = any(
+            item.field == "EventID"
+            for selection in rule.detection.detections.values()
+            for item in selection.detection_items
+        )
+
+        if not has_eventid:
+            return [SigmahqSysmonMissingEventidIssue([rule])]
+        return []
