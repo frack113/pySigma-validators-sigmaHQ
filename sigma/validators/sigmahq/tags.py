@@ -12,10 +12,6 @@ from sigma.validators.base import (
     SigmaValidationIssueSeverity,
 )
 
-from .config import ConfigHQ
-
-config = ConfigHQ()
-
 
 @dataclass
 class SigmahqTagsUniqueDetectionIssue(SigmaValidationIssue):

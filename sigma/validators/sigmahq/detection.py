@@ -14,9 +14,7 @@ from sigma.validators.base import (
     SigmaValidationIssueSeverity,
 )
 
-from .config import ConfigHQ
-
-config = ConfigHQ()
+from sigma.validators.sigmahq.data import data_windows_eventid, data_windows_provider
 
 
 @dataclass
@@ -38,7 +36,7 @@ logsource that doesn't require it."""
 
         if (
             rule.logsource.product == "windows"
-            and rule.logsource.category in config.windows_no_eventid
+            and rule.logsource.category in data_windows_eventid.sigmahq_category_no_eventid
         ):
             return super().validate(rule)
 
@@ -71,8 +69,13 @@ logsource that doesn't require it."""
         if not isinstance(rule, SigmaRule):
             return []
 
-        if rule.logsource in config.windows_provider_name:
-            self.list_provider = config.windows_provider_name[rule.logsource]
+        if not rule.logsource.product == "windows":
+            return []
+
+        if rule.logsource.category in data_windows_provider.sigmahq_provider_name:
+            self.list_provider = data_windows_provider.sigmahq_provider_name[
+                rule.logsource.category
+            ]
             return super().validate(rule)
 
         return []
