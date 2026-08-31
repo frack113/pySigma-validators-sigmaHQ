@@ -17,13 +17,12 @@ class SigmahqIdentifierExistenceIssue(SigmaValidationIssue):
 
 
 class SigmahqIdentifierExistenceValidator(SigmaRuleValidator):
-    """Checks if a rule is missing the id field."""
+    """Checks if a SigmaRule is missing the id field (mandatory for rules, optional for correlation rules)."""
 
     def validate(self, rule: SigmaRule | SigmaCorrelationRule) -> List[SigmaValidationIssue]:
-        if rule.id is None:
+        if isinstance(rule, SigmaRule) and rule.id is None:
             return [SigmahqIdentifierExistenceIssue([rule])]
-        else:
-            return []
+        return []
 
 
 @dataclass

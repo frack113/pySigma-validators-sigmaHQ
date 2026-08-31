@@ -137,3 +137,24 @@ def test_validator_identifier_none_id():
     """
     )
     assert validator.validate(rule) == []
+
+
+def test_validator_identifier_existence_correlation_no_id():
+    """Correlation rules don't require an id (optional per spec)."""
+    validator = SigmahqIdentifierExistenceValidator()
+    rule = SigmaCorrelationRule.from_yaml(
+        """
+    title: Test Correlation
+    status: test
+    correlation:
+        type: event_count
+        rules:
+            - 5638f7c0-ac70-491d-8465-2a65075e0d86
+        timespan: 1h
+        group-by:
+            - ComputerName
+        condition:
+            gte: 100
+    """
+    )
+    assert validator.validate(rule) == []
